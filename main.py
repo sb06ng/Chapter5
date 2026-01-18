@@ -1,5 +1,5 @@
+import functools
 import time
-import functools  # Good practice to include this
 
 
 def measure_time(func):
@@ -9,9 +9,9 @@ def measure_time(func):
         result = func(*args, **kwargs)
         end_time = time.time()
         print(f"Time taken: {end_time - start_time:.5f} seconds")
-        return result  # Return the original function's result (if any)
+        return result
 
-    return wrapper  # Return the wrapper function, don't call it yet!
+    return wrapper
 
 
 @measure_time
@@ -23,11 +23,36 @@ def do_something():
     print(f"Count: {count}")
 
 
+def capitalize_strings(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        new_args = []
+        for arg in args:
+            try:
+                new_args.append(arg.capitalize())
+            except AttributeError:
+                new_args.append(arg)
+        new_kwargs = {}
+        for key, value in kwargs.items():
+            try:
+                new_kwargs[key] = value.capitalize()
+            except AttributeError:
+                new_kwargs[key] = value
+        return func(*tuple(new_args), **new_kwargs)
+
+    return wrapper
+
+
+@capitalize_strings
+def greet_user(name, age, city):
+    print(f"Hello {name}, I see you are from {city} and you are {age} years old.")
+
 
 def main():
     print("Measure time...")
     do_something()  # This now calls 'wrapper'
-
+    print("Capitalize arguments")
+    greet_user("john", 23, "new york")
 
 
 if __name__ == '__main__':
