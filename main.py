@@ -2,6 +2,17 @@ import functools
 import time
 
 
+def log_function(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        return_value = func(*args, **kwargs)
+        print(
+            f"{func.__name__} was called with the following arguments: {args}, {kwargs}. And returned: {return_value}")
+        return return_value
+
+    return wrapper
+
+
 def measure_time(func):
     @functools.wraps(func)  # Preserves the name and docstring of the original function
     def wrapper(*args, **kwargs):
@@ -14,6 +25,7 @@ def measure_time(func):
     return wrapper
 
 
+@log_function
 @measure_time
 def do_something():
     count = 0
@@ -43,6 +55,7 @@ def capitalize_strings(func):
     return wrapper
 
 
+@log_function
 @capitalize_strings
 def greet_user(name, age, city):
     print(f"Hello {name}, I see you are from {city} and you are {age} years old.")
@@ -52,7 +65,7 @@ def main():
     print("Measure time...")
     do_something()  # This now calls 'wrapper'
     print("Capitalize arguments")
-    greet_user("john", 23, "new york")
+    greet_user("john", 23, city="new york")
 
 
 if __name__ == '__main__':
